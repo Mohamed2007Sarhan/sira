@@ -1,0 +1,145 @@
+[
+ {
+  "name": "full fine-tuning",
+  "lr": 0.001,
+  "trainable": 988288,
+  "trainable_pct": 100.0,
+  "optimizer_state_KB": 7721.0,
+  "train_loss": 0.8319914400577545,
+  "heldout_loss": 0.8427350681458888,
+  "exact_match": 0.25666666666666665,
+  "secs": 44.792402029037476
+ },
+ {
+  "name": "LoRA r=1",
+  "lr": 0.02,
+  "trainable": 9248,
+  "trainable_pct": 0.9357596166299702,
+  "optimizer_state_KB": 72.25,
+  "train_loss": 5.353246212005615,
+  "heldout_loss": 5.367876403534893,
+  "exact_match": 0.0,
+  "secs": 44.819947719573975
+ },
+ {
+  "name": "LoRA r=4",
+  "lr": 0.02,
+  "trainable": 36992,
+  "trainable_pct": 3.743038466519881,
+  "optimizer_state_KB": 289.0,
+  "train_loss": 4.9196678638458256,
+  "heldout_loss": 4.883926186326374,
+  "exact_match": 0.006666666666666667,
+  "secs": 48.22899580001831
+ },
+ {
+  "name": "LoRA r=8",
+  "lr": 0.02,
+  "trainable": 73984,
+  "trainable_pct": 7.486076933039762,
+  "optimizer_state_KB": 578.0,
+  "train_loss": 5.721513986587524,
+  "heldout_loss": 5.717413247968049,
+  "exact_match": 0.0,
+  "secs": 52.37244486808777
+ },
+ {
+  "name": "LoRA r=16",
+  "lr": 0.0005,
+  "trainable": 147968,
+  "trainable_pct": 14.972153866079523,
+  "optimizer_state_KB": 1156.0,
+  "train_loss": 4.5950511455535885,
+  "heldout_loss": 4.636138642315372,
+  "exact_match": 0.013333333333333334,
+  "secs": 41.90616726875305
+ },
+ {
+  "name": "LoRA r=16",
+  "lr": 0.002,
+  "trainable": 147968,
+  "trainable_pct": 14.972153866079523,
+  "optimizer_state_KB": 1156.0,
+  "train_loss": 4.498825216293335,
+  "heldout_loss": 4.543864023525084,
+  "exact_match": 0.013333333333333334,
+  "secs": 44.89310574531555
+ },
+ {
+  "name": "LoRA r=16",
+  "lr": 0.006,
+  "trainable": 147968,
+  "trainable_pct": 14.972153866079523,
+  "optimizer_state_KB": 1156.0,
+  "train_loss": 4.735382509231568,
+  "heldout_loss": 4.7423142232167885,
+  "exact_match": 0.006666666666666667,
+  "secs": 45.07019519805908
+ },
+ {
+  "name": "full FT, embeddings frozen",
+  "lr": 0.001,
+  "trainable": 800128,
+  "trainable_pct": 75.32232799132426,
+  "optimizer_state_KB": 6251.0,
+  "train_loss": 3.4915729761123657,
+  "heldout_loss": 3.5334474024751263,
+  "exact_match": 0.06,
+  "secs": 50.61084342002869
+ },
+ {
+  "name": "LoRA r=1",
+  "lr": 0.002,
+  "trainable": 9248,
+  "trainable_pct": 0.9357596166299702,
+  "optimizer_state_KB": 72.25,
+  "train_loss": 4.6345607280731205,
+  "heldout_loss": 4.668210701022982,
+  "exact_match": 0.006666666666666667,
+  "secs": 39.7425320148468
+ },
+ {
+  "name": "LoRA r=4",
+  "lr": 0.002,
+  "trainable": 36992,
+  "trainable_pct": 3.743038466519881,
+  "optimizer_state_KB": 289.0,
+  "train_loss": 4.6245471954345705,
+  "heldout_loss": 4.6524452927935815,
+  "exact_match": 0.0033333333333333335,
+  "secs": 42.09035897254944
+ },
+ {
+  "name": "LoRA r=32",
+  "lr": 0.002,
+  "trainable": 295936,
+  "trainable_pct": 29.944307732159047,
+  "optimizer_state_KB": 2312.0,
+  "train_loss": 4.2916419982910154,
+  "heldout_loss": 4.358003077485637,
+  "exact_match": 0.03333333333333333,
+  "secs": 44.51551008224487
+ },
+ {
+  "name": "rsLoRA r=16",
+  "lr": 0.002,
+  "trainable": 147968,
+  "trainable_pct": 14.972153866079523,
+  "optimizer_state_KB": 1156.0,
+  "train_loss": 4.8123206615448,
+  "heldout_loss": 4.807661116390485,
+  "exact_match": 0.006666666666666667,
+  "secs": 42.82066988945007
+ },
+ {
+  "name": "DoRA r=8",
+  "lr": 0.002,
+  "trainable": 78784,
+  "trainable_pct": 7.9717653153736565,
+  "optimizer_state_KB": 615.5,
+  "train_loss": 4.524538850784301,
+  "heldout_loss": 4.575688109804162,
+  "exact_match": 0.016666666666666666,
+  "secs": 59.61682105064392
+ }
+]

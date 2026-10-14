@@ -1,0 +1,10 @@
+{
+  "llm_provider": "ollama",
+  "llm_model": "qwen2.5:7b",
+  "scratch_mode": true,
+  "scratch_language": "en",
+  "scratch_size": "auto",
+  "scratch_corpus_dir": "",
+  "scratch_wiki_mb": 40,
+  "scratch_steps": 2000
+}

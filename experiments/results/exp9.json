@@ -1,0 +1,75 @@
+{
+ "gpt2_seed9_guardon": {
+  "params": 155392,
+  "history": [
+   {
+    "round": 0,
+    "acc": 0.0,
+    "arith:1": 0.0,
+    "arith:2": 0.0,
+    "arith:3": 0.0,
+    "accepted": true
+   },
+   {
+    "round": 1,
+    "accepted": true,
+    "lr": 0.0022,
+    "acc": 0.0,
+    "arith:1": 0.0,
+    "arith:2": 0.0,
+    "arith:3": 0.0,
+    "p": 1.0,
+    "regress": 0,
+    "algo": "rft",
+    "boot": 150,
+    "replay": 0,
+    "support": 0.0
+   },
+   {
+    "round": 2,
+    "accepted": true,
+    "lr": 0.0024200000000000003,
+    "acc": 0.0,
+    "arith:1": 0.0,
+    "arith:2": 0.0,
+    "arith:3": 0.0,
+    "p": 1.0,
+    "regress": 0,
+    "algo": "rft",
+    "boot": 150,
+    "replay": 45,
+    "support": 0.0
+   },
+   {
+    "round": 3,
+    "accepted": true,
+    "lr": 0.0026620000000000003,
+    "acc": 0.0,
+    "arith:1": 0.0,
+    "arith:2": 0.0,
+    "arith:3": 0.0,
+    "p": 1.0,
+    "regress": 0,
+    "algo": "rft",
+    "boot": 150,
+    "replay": 45,
+    "support": 0.01
+   },
+   {
+    "round": 4,
+    "accepted": true,
+    "lr": 0.0029282000000000006,
+    "acc": 0.011111111111111112,
+    "arith:1": 0.0,
+    "arith:2": 0.033,
+    "arith:3": 0.0,
+    "p": 0.5,
+    "regress": 0,
+    "algo": "rft",
+    "boot": 150,
+    "replay": 45,
+    "support": 0.01
+   }
+  ]
+ }
+}

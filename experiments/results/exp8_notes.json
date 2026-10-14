@@ -1,0 +1,47 @@
+{
+ "exp8_summary": {
+  "ladder_probe_gen0_exact_match": {
+   "a10-99,b10-99": 0.857,
+   "a100-119,b10-99": 0.0,
+   "a100-149,b10-99": 0.0,
+   "a100-199,b10-99": 0.0,
+   "a100-299,b10-99": 0.0,
+   "a100-499,b10-99": 0.0,
+   "a100-999,b10-99": 0.0,
+   "a100-999,b100-999": 0.0,
+   "note": "capability cliff: no reachable intermediate level"
+  },
+  "grpo_binary_seed0": {
+   "learning_rows_each_round": 0,
+   "acc3_final": 0.0,
+   "acc2_final": 0.825
+  },
+  "grpo_digit_graded_seed0": {
+   "acc3_final": 0.0,
+   "acc2_final": 0.623
+  },
+  "grpo_numeric_closeness_seed0": {
+   "acc3_final": 0.0,
+   "acc2_final": 0.253
+  },
+  "rft_graded_best_of_k_seed0": {
+   "learning_rows": 0,
+   "acc3_final": 0.0,
+   "acc2_final": 0.825
+  },
+  "bootstrap_lesson_400_examples_400_steps": {
+   "acc3": 0.005,
+   "acc2": 0.7275,
+   "control_only_lesson_after_4x100_more_steps": {
+    "acc3": 0.003,
+    "acc2": 0.688
+   }
+  },
+  "bootstrap_lesson_1500_examples_1200_steps": {
+   "acc3": 0.015,
+   "acc2": 0.9275,
+   "note": "RFT rounds after this lesson did not finish within the time limit of this session"
+  },
+  "conclusion": "reward shaping cannot create capability from zero support; rehearsal prevents forgetting; capability cliffs need substantial external supervision"
+ }
+}

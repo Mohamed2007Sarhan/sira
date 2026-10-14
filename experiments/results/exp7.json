@@ -1,0 +1,120 @@
+{
+ "assumptions": {
+  "A100": {
+   "gpu": "A100-80GB",
+   "peak_tflops": 312.0,
+   "mfu": 0.4,
+   "hbm_GBps": 2039.0,
+   "usd_per_gpu_hour": 2.0
+  },
+  "H100": {
+   "gpu": "H100-80GB",
+   "peak_tflops": 989.0,
+   "mfu": 0.4,
+   "hbm_GBps": 3350.0,
+   "usd_per_gpu_hour": 3.5
+  }
+ },
+ "models": [
+  {
+   "model": "Qwen2.5-0.5B",
+   "N": 494005120,
+   "chinchilla_optimal_tokens": 9880102400,
+   "chinchilla_loss_at_20N": 2.7339984492558336,
+   "epoch_loss_at_20N": 2.733807330690355,
+   "pretrain_flops_20N": 29284927030345728000,
+   "pretrain_gpu_hours_A100-80GB": 65.18190667366838,
+   "pretrain_usd_A100-80GB": 130.36381334733676,
+   "pretrain_gpu_hours_H100-80GB": 20.562947302512168,
+   "pretrain_usd_H100-80GB": 71.97031555879259,
+   "ft_10M_tokens_flops": 2.96403072e+16,
+   "ft_10M_tokens_minutes_A100": 3.958374358974359,
+   "rft_sampling_tokens": 1200000,
+   "rft_sampling_seconds_A100_batch128": 4.542715056400196,
+   "weights_bf16_GB": 0.98801024,
+   "lora_r16_trainable_M": 8.798208,
+   "qlora_weights_GB": 0.26182271360000003,
+   "full_ft_GB": 7.90408192,
+   "kv_GB_per_32k_sequence": 0.402653184,
+   "kv_GB_per_32k_sequence_CLA2": 0.201326592,
+   "max_concurrent_32k_seqs_in_40GB_free_after_weights_80GB_gpu": 186.2942918141683,
+   "max_concurrent_32k_seqs_CLA2": 372.5885836283366
+  },
+  {
+   "model": "Llama-3-8B",
+   "N": 8030261248,
+   "chinchilla_optimal_tokens": 160605224960,
+   "chinchilla_loss_at_20N": 2.1345644644120125,
+   "epoch_loss_at_20N": 2.1560656458086096,
+   "pretrain_flops_20N": 7738211485335662100480,
+   "pretrain_gpu_hours_A100-80GB": 17223.583256178023,
+   "pretrain_usd_A100-80GB": 34447.166512356045,
+   "pretrain_gpu_hours_H100-80GB": 5433.526770401964,
+   "pretrain_usd_H100-80GB": 19017.343696406875,
+   "ft_10M_tokens_flops": 4.8181567488e+17,
+   "ft_10M_tokens_minutes_A100": 64.34504205128205,
+   "rft_sampling_tokens": 1200000,
+   "rft_sampling_seconds_A100_batch128": 73.84374615007356,
+   "weights_bf16_GB": 16.060522496,
+   "lora_r16_trainable_M": 41.94304,
+   "qlora_weights_GB": 4.25603846144,
+   "full_ft_GB": 128.484179968,
+   "kv_GB_per_32k_sequence": 4.294967296,
+   "kv_GB_per_32k_sequence_CLA2": 2.147483648,
+   "max_concurrent_32k_seqs_in_40GB_free_after_weights_80GB_gpu": 13.955747127532957,
+   "max_concurrent_32k_seqs_CLA2": 27.911494255065914
+  },
+  {
+   "model": "Llama-2-70B",
+   "N": 68976648192,
+   "chinchilla_optimal_tokens": 1379532963840,
+   "chinchilla_loss_at_20N": 1.9218599030516967,
+   "epoch_loss_at_20N": 1.9745065031288014,
+   "pretrain_flops_20N": 570933359496352424263680,
+   "pretrain_gpu_hours_A100-80GB": 1270774.0373405279,
+   "pretrain_usd_A100-80GB": 2541548.0746810557,
+   "pretrain_gpu_hours_H100-80GB": 400891.30399418075,
+   "pretrain_usd_H100-80GB": 1403119.5639796327,
+   "ft_10M_tokens_flops": 4.13859889152e+18,
+   "ft_10M_tokens_minutes_A100": 552.6975015384616,
+   "rft_sampling_tokens": 1200000,
+   "rft_sampling_seconds_A100_batch128": 634.2874711132908,
+   "weights_bf16_GB": 137.953296384,
+   "lora_r16_trainable_M": 207.09376,
+   "qlora_weights_GB": 36.55762354176,
+   "full_ft_GB": 1103.626371072,
+   "kv_GB_per_32k_sequence": 10.73741824,
+   "kv_GB_per_32k_sequence_CLA2": 5.36870912,
+   "max_concurrent_32k_seqs_in_40GB_free_after_weights_80GB_gpu": 0,
+   "max_concurrent_32k_seqs_CLA2": 0
+  }
+ ],
+ "stats": {
+  "se_accuracy_p0.5_n80": 0.05590169943749474,
+  "se_accuracy_p0.9_n400": 0.015,
+  "ci95_halfwidth_p0.9_n400": 0.0294,
+  "paired_example_9_vs_3_p": 0.072998046875
+ },
+ "pass_at_k": {
+  "0.01": {
+   "1": 0.010000000000000009,
+   "4": 0.039403990000000055,
+   "16": 0.14854222890512447
+  },
+  "0.05": {
+   "1": 0.050000000000000044,
+   "4": 0.18549375000000012,
+   "16": 0.5598733313482347
+  },
+  "0.2": {
+   "1": 0.19999999999999996,
+   "4": 0.5903999999999999,
+   "16": 0.9718525023289344
+  },
+  "0.5": {
+   "1": 0.5,
+   "4": 0.9375,
+   "16": 0.9999847412109375
+  }
+ }
+}

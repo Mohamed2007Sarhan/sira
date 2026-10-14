@@ -1,0 +1,11 @@
+{
+  "llm_provider": "ollama",
+  "llm_model": "llama3.1:8b",
+  "llm_base_url": "http://localhost:11434",
+  "llm_num_ctx": 16384,
+  "llm_json_mode": true,
+  "base_model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "budget_usd": 1,
+  "budget_gpu_hours": 12,
+  "budget_wall_hours": 48
+}

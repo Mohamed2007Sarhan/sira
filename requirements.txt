@@ -1,0 +1,13 @@
+# Core (agents, sandbox, GUI, evaluation): Python standard library + tkinter only.
+# Training stack - installed automatically at start-up (auto_install), or manually:
+torch
+transformers>=4.44
+peft>=0.12
+accelerate
+safetensors
+tokenizers
+huggingface_hub
+sentencepiece
+numpy
+# QLoRA / 8-bit optimizers (Linux + NVIDIA GPU only):
+# bitsandbytes

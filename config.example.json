@@ -1,0 +1,13 @@
+{
+  "base_model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "goal_text": "Become the strongest model possible on the SIRA Fresh Set",
+  "target_score": 0.9,
+  "budget_usd": 50,
+  "budget_gpu_hours": 24,
+  "budget_wall_hours": 72,
+  "llm_provider": "anthropic",
+  "llm_model": "claude-sonnet-5-5",
+  "algorithm": "auto",
+  "sandbox_backend": "auto",
+  "sandbox_network": "none"
+}

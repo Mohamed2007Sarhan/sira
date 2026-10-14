@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sira"
+version = "2.0.0"
+description = "SIRA - Self-Improving Research Agent: verifier-grounded autonomous AI self-learning platform"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = []        # the core (agents, sandbox, GUI, evaluation) is pure standard library + tkinter
+
+[project.optional-dependencies]
+train = ["torch", "transformers>=4.48", "peft>=0.12", "accelerate", "safetensors", "tokenizers", "huggingface_hub", "sentencepiece", "numpy"]
+qlora = ["bitsandbytes"]
+
+[project.scripts]
+sira = "sira.__main__:main"
+
+[tool.setuptools]
+packages = ["sira"]
+
+[tool.setuptools.package-data]
+sira = ["manifest.json"]

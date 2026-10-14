@@ -1,0 +1,7 @@
+{
+  "llm_provider": "openai_compatible",
+  "llm_model": "my-model-name",
+  "llm_base_url": "https://my-server.example.com/v1",
+  "llm_api_key_env": "MY_SERVER_API_KEY",
+  "base_model": "Qwen/Qwen2.5-0.5B-Instruct"
+}

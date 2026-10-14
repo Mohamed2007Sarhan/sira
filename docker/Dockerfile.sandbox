@@ -1,0 +1,7 @@
+# Sandbox image for experiment code. Build:  python -m sira --build-sandbox
+FROM python:3.12-slim
+ENV PIP_NO_CACHE_DIR=1 PYTHONDONTWRITEBYTECODE=1
+RUN pip install --no-cache-dir numpy scipy sympy pandas networkx scikit-learn matplotlib rdkit pyscf
+# optional heavier simulators (uncomment if you need them): openmm ase
+RUN useradd -u 65534 -M nobody 2>/dev/null || true
+WORKDIR /work

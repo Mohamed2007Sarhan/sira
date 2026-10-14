@@ -1,0 +1,21 @@
+{
+  "mode": "auto",
+  "quest_goal": "reach AGI: build the strongest possible general problem-solving ability",
+  "quest_seeds": [],
+  "llm_provider": "ollama",
+  "llm_model": "qwen2.5:14b",
+  "llm_json_mode": true,
+  "examiner_provider": "ollama",
+  "examiner_model": "llama3.2:3b",
+  "examiner_weight": 0.2,
+  "society_enabled": true,
+  "quest_pass_score": 0.8,
+  "quest_pass_rounds": 3,
+  "quest_skill_pass": 0.6,
+  "attempts_per_challenge": 5,
+  "sandbox_network": "none",
+  "budget_usd": 5,
+  "budget_gpu_hours": 48,
+  "budget_wall_hours": 720,
+  "thinking": "medium"
+}
