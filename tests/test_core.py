@@ -1,5 +1,5 @@
 """Run:  python -m unittest tests.test_core -v   (needs bwrap or docker for the sandbox tests)"""
-import hashlib, json, os, sys, tempfile, threading, unittest
+import hashlib, importlib.util, json, os, sys, tempfile, threading, unittest
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -288,6 +288,7 @@ class TStats(unittest.TestCase):
         self.assertLess(binom_tail(10, 10), 0.001)
 
 
+@unittest.skipUnless(__import__("importlib").util.find_spec("torch") and __import__("importlib").util.find_spec("transformers"), "needs torch + transformers")
 class TCla(unittest.TestCase):
     def test_cla_cache_equivalence_and_savings(self):
         import torch

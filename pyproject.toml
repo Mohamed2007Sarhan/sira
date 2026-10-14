@@ -4,16 +4,21 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sira"
-version = "2.0.0"
+version = "2.1.0"
 description = "SIRA - Self-Improving Research Agent: verifier-grounded autonomous AI self-learning platform"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-dependencies = []        # the core (agents, sandbox, GUI, evaluation) is pure standard library + tkinter
+dependencies = []        # the core (agents, sandbox, GUI, evaluation, doctor, dashboard) is pure standard library + tkinter
 
 [project.optional-dependencies]
 train = ["torch", "transformers>=4.48", "peft>=0.12", "accelerate", "safetensors", "tokenizers", "huggingface_hub", "sentencepiece", "numpy"]
 qlora = ["bitsandbytes"]
+dev = ["sympy"]
+all = ["sira[train,dev]"]
+
+[project.urls]
+Repository = "https://github.com/Mohamed2007Sarhan/sira"
 
 [project.scripts]
 sira = "sira.__main__:main"

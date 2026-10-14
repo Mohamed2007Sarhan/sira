@@ -1,4 +1,4 @@
-"""Entry point:  python -m sira [--config file.json] [--headless] [--selftest] [--build-sandbox]"""
+"""Entry point:  python -m sira [--config file.json] [--headless] [--selftest] [--doctor] [--check-config] [--report|--list-runs|--serve] ..."""
 from __future__ import annotations
 
 import argparse
@@ -27,7 +27,78 @@ def main(argv=None) -> int:
     ap.add_argument("--verify-install", action="store_true", help="check every package file against the release manifest (detects corruption)")
     ap.add_argument("--bootstrap", action="store_true", help="probe this machine, install missing packages, show usable algorithms, and exit")
     ap.add_argument("--build-sandbox", action="store_true", help="build the Docker sandbox image and exit")
+    ap.add_argument("--doctor", action="store_true", help="one-shot health check: integrity, deps, sandbox self-test, GPU, config, brain; exit 1 on any FAIL")
+    ap.add_argument("--fast", action="store_true", help="with --doctor: skip the sandbox self-test")
+    ap.add_argument("--json", action="store_true", help="machine-readable output for --doctor / --check-config / --list-runs")
+    ap.add_argument("--check-config", action="store_true", help="validate --config (typos, types, ranges, provider/key, mode) and exit")
+    ap.add_argument("--report", metavar="RUN_DIR", help="summarise a run folder and exit (see --format/--out)")
+    ap.add_argument("--format", choices=["html", "md", "json"], default="html", help="format for --report")
+    ap.add_argument("--out", help="output file for --report (html default: <run>/report.html; md/json default: stdout)")
+    ap.add_argument("--list-runs", nargs="?", const="runs", metavar="ROOT", help="list run folders under ROOT (default: runs)")
+    ap.add_argument("--serve", metavar="ROOT", help="read-only local dashboard for a run folder or a folder of runs")
+    ap.add_argument("--host", default="127.0.0.1", help="--serve bind address (non-loopback requires --token)")
+    ap.add_argument("--port", type=int, default=8765, help="--serve port")
+    ap.add_argument("--token", default=None, help="--serve access token")
     args = ap.parse_args(argv)
+    if args.check_config:
+        from .configcheck import check_config
+        if not args.config:
+            print("--check-config needs --config FILE")
+            return 2
+        rep = check_config(args.config)
+        if args.json:
+            print(json.dumps(rep, indent=2))
+        else:
+            for e in rep["errors"]:
+                print("ERROR  ", e)
+            for w in rep["warnings"]:
+                print("WARNING", w)
+            print("config OK" if rep["ok"] else f"config has {len(rep['errors'])} error(s)")
+        return 0 if rep["ok"] else 1
+
+    if args.doctor:
+        from .doctor import run_doctor, format_report
+        rep = run_doctor(args.config, fast=args.fast)
+        print(json.dumps(rep, indent=2) if args.json else format_report(rep))
+        return 0 if rep["ok"] else 1
+
+    if args.list_runs is not None:
+        from .report import list_runs
+        rows = list_runs(args.list_runs)
+        if args.json:
+            print(json.dumps(rows, indent=2, default=str))
+        else:
+            for r in rows:
+                print(f"{r['run']:<26} {str(r['state']):<34} mode={r['mode']} best={r['best_score']} gens={r['generations']} updated={r['updated']}")
+            if not rows:
+                print(f"no runs found in {args.list_runs}")
+        return 0
+
+    if args.report:
+        from .report import summarize, render_html, render_markdown
+        try:
+            sm = summarize(args.report)
+        except FileNotFoundError as e:
+            print(e)
+            return 2
+        text = {"html": lambda: render_html(sm), "md": lambda: render_markdown(sm), "json": lambda: json.dumps(sm, indent=2, default=str)}[args.format]()
+        dest = args.out or (str(Path(args.report) / "report.html") if args.format == "html" else None)
+        if dest:
+            Path(dest).write_text(text, encoding="utf-8")
+            print(f"report written: {dest}")
+        else:
+            print(text)
+        return 0
+
+    if args.serve:
+        from .report import serve
+        try:
+            serve(args.serve, args.host, args.port, args.token)
+        except ValueError as e:
+            print(e)
+            return 2
+        return 0
+
     cfg = Config.load(args.config) if args.config else Config()
     if args.resume:
         cfg = Config.load(Path(args.resume) / "config.json")

@@ -14,8 +14,9 @@ The run can end in exactly three ways: **goal reached**, **budget exhausted**, *
 
 ---------------------------------------------------------------------------------------------------
 
-## What is new in this version
+## What is new in this version (2.1)
 
+* **Tooling:** `--doctor`, `--check-config`, `--report`, `--list-runs`, `--serve` (see section 11); `eval()`-free math verification; CI + LICENSE.
 * **Architecture choice (Cross-Layer Attention, GQA, MQA, any custom shape).** Born from scratch with the architecture you pick (`scratch_arch`: `gqa`, `llama`, `mha`, `mqa`, `cla2`, `cla3`, `custom`), or convert a ready model (Llama family) from the **Brain map** tab (*Convert architecture...*): weight surgery + short healing run, kept only if its score is within `arch_tolerance` of the parent. CLA = every `f` consecutive layers share one set of K/V projections, so the KV cache shrinks `f` times (see `sira/cla_model.py`; verified: cached decoding equals the full forward pass to 3e-7).
 * **Thinking in every layer** of the architecture from the original design book: Evaluation Core, AI Researcher, Sandbox, Verifier, Failure Analysis, Experience Memory, Improvement Engine and an automated Red Team. Each layer deliberates (analysis, risks, alternatives, decision, confidence) before acting; see the **Thinking** tab and `thinking: off|low|medium|high`. Thoughts are advice - the mechanical checks (evaluator, verifier, sandbox) are never overridden.
 * **Environment bootstrap** (installs the training stack, adapts to the machine), **Ollama + every OpenAI-compatible provider**, **GRPO / DPO / DoRA / rsLoRA / LoRA+ / DARE**, a paired statistical test for accepting generations.
@@ -45,7 +46,7 @@ Set `mode` to `auto` (or `quest`) and write only the goal, e.g. *"reach AGI"* or
 
 `GOAL_REACHED` in quest mode means *the system passed this operational examination* (exam streak, criteria coverage, society life score, challenge skill). It is **not** a proof of AGI or consciousness. With a model (`mode: both|auto` plus `base_model` or `scratch_mode`) the platform also trains the weights on verified self-generated data, exam corrections and challenge rollouts (graded rewards for GRPO).
 
-## What is new in this version
+## 1. Requirements
 
 | Item | Needed for | Notes |
 |---|---|---|
@@ -191,4 +192,16 @@ Snapshots (database, config, station, reports, best weights via hard links, sha2
 * Simulators are approximations; important claims should be compared with real data (`worldlab.compare_to_data`).
 * Tested here: sandbox (bubblewrap), GUI (virtual display), training / merging / transplant / pre-training on tiny local models on CPU, every stop condition, backups, providers against fake servers, real package auto-install. **Not tested here** (offline environment): live LLM APIs and a real Ollama server, live web search, Docker, GPU/QLoRA, downloading real Hugging Face models. Run `--selftest` and `--test-llm` first on your machine.
 
-Tests: `python -m unittest tests.test_core -v`
+Tests: `python -m unittest discover -s tests -t . -v` (or `make test`).
+
+## 11. Tooling (new in 2.1)
+
+| Command | What it does |
+|---|---|
+| `python -m sira --doctor [--fast] [--json] [--config f.json]` | one-shot health check: manifest integrity, Python, tkinter, training stack, sandbox backend **and isolation self-test**, GPU, disk, config, brain connectivity. Exit code 1 on any FAIL |
+| `python -m sira --check-config --config f.json` | typos (with "did you mean"), wrong types, out-of-range values, missing API key variable, inconsistent mode/goal settings |
+| `python -m sira --report runs/run_X [--format html\|md\|json] [--out f]` | summary of a run: generations + score chart, claims by status, experiments, evals, rewards, challenges, exams |
+| `python -m sira --list-runs [runs]` | table of run folders with state, best score, generations |
+| `python -m sira --serve runs [--port 8765] [--host 127.0.0.1] [--token T]` | read-only dashboard for headless servers. Loopback by default; any other `--host` **requires** `--token`. Strict CSP, no JavaScript |
+
+Development: `make check` (compile + integrity + tests), `make manifest` after editing code (CI fails if the manifest is stale).

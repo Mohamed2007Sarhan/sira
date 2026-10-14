@@ -536,6 +536,88 @@ def _num_namespace():
     return ns
 
 
+# ---- safe expression evaluation (replaces eval(); no attribute access, no comprehensions, no lambdas, bounded size/cost) ----
+import ast as _ast
+import functools as _functools
+
+_MAX_EXPR_LEN, _MAX_NODES = 2000, 400
+_ALLOWED_NODES = (_ast.Expression, _ast.BinOp, _ast.UnaryOp, _ast.Constant, _ast.Name, _ast.Call, _ast.List, _ast.Tuple, _ast.Load,
+                  _ast.Add, _ast.Sub, _ast.Mult, _ast.Div, _ast.Mod, _ast.FloorDiv, _ast.Pow, _ast.UAdd, _ast.USub)
+_BINOPS = {_ast.Add: lambda a, b: a + b, _ast.Sub: lambda a, b: a - b, _ast.Mult: lambda a, b: a * b,
+           _ast.Div: lambda a, b: a / b, _ast.Mod: lambda a, b: a % b, _ast.FloorDiv: lambda a, b: a // b}
+_ALLOWED_CALLS = {id(v) for v in _num_namespace().values() if callable(v)}
+_HEAVY = {math.factorial, math.comb, math.perm}
+
+
+def _safe_pow(a, b):
+    if isinstance(a, int) and isinstance(b, int) and b >= 0 and (b > 4096 or a.bit_length() * b > 8192):
+        raise ValueError("exponent too large")
+    return a ** b
+
+
+@_functools.lru_cache(maxsize=2048)
+def _parse_expr(expr):
+    if not isinstance(expr, str) or not expr.strip():
+        raise ValueError("empty expression")
+    if len(expr) > _MAX_EXPR_LEN:
+        raise ValueError("expression too long")
+    tree = _ast.parse(expr.strip(), mode="eval")
+    for n, node in enumerate(_ast.walk(tree), 1):
+        if n > _MAX_NODES:
+            raise ValueError("expression too complex")
+        if not isinstance(node, _ALLOWED_NODES):
+            raise ValueError("disallowed syntax: " + type(node).__name__)
+        if isinstance(node, _ast.Constant) and type(node.value) not in (int, float):
+            raise ValueError("only numeric constants are allowed")
+        if isinstance(node, _ast.Call) and (not isinstance(node.func, _ast.Name) or node.keywords):
+            raise ValueError("only plain calls of whitelisted functions are allowed")
+    return tree
+
+
+def check_expr(expr, names):
+    """Validate syntax and that every name is in `names`; returns the parsed tree. Raises ValueError/SyntaxError."""
+    tree = _parse_expr(expr)
+    for node in _ast.walk(tree):
+        if isinstance(node, _ast.Name) and node.id not in names:
+            raise ValueError("unknown name %r" % node.id)
+    return tree
+
+
+def _ev_node(node, env):
+    t = type(node)
+    if t is _ast.Constant:
+        return node.value
+    if t is _ast.Name:
+        if node.id not in env:
+            raise ValueError("unknown name %r" % node.id)
+        return env[node.id]
+    if t is _ast.BinOp:
+        a, b = _ev_node(node.left, env), _ev_node(node.right, env)
+        return _safe_pow(a, b) if type(node.op) is _ast.Pow else _BINOPS[type(node.op)](a, b)
+    if t is _ast.UnaryOp:
+        v = _ev_node(node.operand, env)
+        return -v if type(node.op) is _ast.USub else +v
+    if t in (_ast.List, _ast.Tuple):
+        items = [_ev_node(e, env) for e in node.elts]
+        return items if t is _ast.List else tuple(items)
+    if t is _ast.Call:
+        fn = env.get(node.func.id)
+        if id(fn) not in _ALLOWED_CALLS:
+            raise ValueError("function %r is not allowed" % node.func.id)
+        args = [_ev_node(a, env) for a in node.args]
+        if fn is pow and len(args) == 2:
+            return _safe_pow(*args)
+        if fn in _HEAVY and any(isinstance(a, int) and abs(a) > 5000 for a in args):
+            raise ValueError("argument too large")
+        return fn(*args)
+    raise ValueError("disallowed syntax: " + t.__name__)
+
+
+def safe_eval(expr, env):
+    """Evaluate a numeric expression using only the names in `env` (math functions + variables)."""
+    return _ev_node(_parse_expr(expr).body, env)
+
+
 def _split_eq(expr: str):
     if "=" in expr and "==" not in expr and "<=" not in expr and ">=" not in expr:
         l, r = expr.split("=", 1)
@@ -551,10 +633,17 @@ def math_verify(steps, symbols=("x",), mode="chain", samples=40, tol=1e-7, domai
     pts = [{s: rng.uniform(*domain) for s in symbols} for _ in range(samples)]
     ns = _num_namespace()
 
+    names = set(ns) | set(symbols)
+
     def ev(e, pt):
-        return eval(e.replace("^", "**"), {"__builtins__": {}}, {**ns, **pt})
+        return safe_eval(e.replace("^", "**"), {**ns, **pt})
 
     def equal(a, b):
+        try:                                           # never hand unvalidated text to sympy.sympify (it uses eval internally)
+            check_expr(a.replace("^", "**"), names)
+            check_expr(b.replace("^", "**"), names)
+        except (ValueError, SyntaxError, RecursionError) as ex:
+            return False, {"error": "rejected expression: %s" % ex}, "rejected"
         method = "numeric"
         try:
             import sympy
