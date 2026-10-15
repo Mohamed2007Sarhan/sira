@@ -179,6 +179,8 @@ def _kill_group(p):
 
 
 def _count_user_procs() -> int:
+    """Number of tasks owned by this uid. RLIMIT_NPROC counts every task (threads included), not only processes:
+    counting processes alone under-estimates on a busy desktop (browser, IDE) and makes namespace creation fail with EAGAIN."""
     uid = os.getuid()
     n = 0
     try:
@@ -186,7 +188,7 @@ def _count_user_procs() -> int:
             if d.isdigit():
                 try:
                     if os.stat(f"/proc/{d}").st_uid == uid:
-                        n += 1
+                        n += max(1, len(os.listdir(f"/proc/{d}/task")))
                 except OSError:
                     pass
     except OSError:
@@ -197,7 +199,7 @@ def _count_user_procs() -> int:
 def _rlimit_preexec(cfg, timeout):
     mem = int(cfg.sandbox_mem_mb) * 1024 * 1024
     fsize = int(cfg.sandbox_max_file_mb) * 1024 * 1024
-    nproc = _count_user_procs() + int(cfg.sandbox_pids) + 16
+    nproc = _count_user_procs() + int(cfg.sandbox_pids) + 256     # margin: other tasks may start before the sandbox does
     cpu = int(timeout) + 5
 
     def fn():

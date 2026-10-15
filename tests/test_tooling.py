@@ -174,7 +174,7 @@ class CLI(unittest.TestCase):
             self.assertIn("run_a", self.run_cli("--list-runs", t)[1])
             self.assertEqual(self.run_cli("--report", t + "/missing")[0], 2)
             self.assertEqual(self.run_cli("--serve", t, "--host", "0.0.0.0")[0], 2)
-            self.assertEqual(self.run_cli("--version")[1].strip(), "2.1.0")
+            self.assertEqual(self.run_cli("--version")[1].strip(), "2.2.0")
 
 
 if __name__ == "__main__":

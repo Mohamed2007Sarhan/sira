@@ -95,9 +95,10 @@ def run_doctor(config_path=None, fast: bool = False) -> dict:
                 from .sandbox import make_sandbox, SandboxUnavailable
                 try:
                     rep = make_sandbox(cfg, tmp).selftest()
-                    bad = [c["name"] for c in rep["checks"] if not c["ok"] and c["critical"]]
+                    bad = [c for c in rep["checks"] if not c["ok"] and c["critical"]]
+                    why = next((c["detail"].strip().splitlines()[-1][:200] for c in bad if c.get("detail", "").strip()), "")
                     add("sandbox self-test", "ok" if rep["passed"] and rep["strong"] else "fail",
-                        f"backend={rep['backend']} strong={rep['strong']} passed={rep['passed']}" + (f" failed: {bad}" if bad else ""))
+                        f"backend={rep['backend']} strong={rep['strong']} passed={rep['passed']}" + (f" failed: {[c['name'] for c in bad]}" if bad else "") + (f" - first error: {why}" if why else ""))
                 except SandboxUnavailable as e:
                     add("sandbox self-test", "fail", str(e)[:200])
             except Exception as e:

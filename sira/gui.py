@@ -16,6 +16,8 @@ from .control import StopReason
 from .gui_extra import ExtraTabs
 from .llm import LLM, PROVIDERS, ollama_base, ollama_models, ollama_pull
 from .orchestrator import Orchestrator
+from .setup_layout import layout
+from .ui_kit import ScrollFrame, apply_theme
 
 LEVEL_COLORS = {"info": "#222222", "warn": "#b36b00", "error": "#c00000"}
 KIND_COLORS = {"tool": "#2060a0", "experiment": "#006666", "verify": "#7a2fa0", "thought": "#777777",
@@ -25,8 +27,10 @@ KIND_COLORS = {"tool": "#2060a0", "experiment": "#006666", "verify": "#7a2fa0", 
 class App(tk.Tk, ExtraTabs):
     def __init__(self, cfg: Config | None = None):
         super().__init__()
+        apply_theme(self)
         self.title("SIRA - Self-Improving Research Agent")
         self.geometry("1280x820")
+        self.minsize(960, 600)
         self.cfg = cfg or Config()
         self.orch: Orchestrator | None = None
         self.vars: dict[str, tk.Variable] = {}
@@ -104,39 +108,71 @@ class App(tk.Tk, ExtraTabs):
                 ("scratch_wiki_mb", "From scratch: MB of Wikipedia text to fetch", "int"),
                 ("scratch_steps", "From scratch: pretraining steps", "int")]
         self.spec = spec
-        for r, (key, label, typ) in enumerate(spec):
-            ttk.Label(t, text=label).grid(row=r, column=0, sticky="w", padx=8, pady=3)
-            val = getattr(self.cfg, key)
-            if typ == "bool":
-                v = tk.BooleanVar(value=val)
-                w = ttk.Checkbutton(t, variable=v)
-            elif typ == "list":
-                v = tk.StringVar(value=", ".join(val))
-                w = ttk.Entry(t, textvariable=v, width=60)
-            elif isinstance(typ, tuple):
-                v = tk.StringVar(value=val)
-                w = ttk.Combobox(t, textvariable=v, values=typ, state="readonly", width=20)
-            else:
-                v = tk.StringVar(value=str(val))
-                w = ttk.Entry(t, textvariable=v, width=60)
-            self.vars[key] = v
-            w.grid(row=r, column=1, sticky="w", pady=3)
-        b = ttk.Frame(t)
-        b.grid(row=len(spec), column=0, columnspan=2, pady=12, sticky="w", padx=8)
-        self.start_btn = tk.Button(b, text="START RUN (existing model)", bg="#0a7a0a", fg="white", font=("TkDefaultFont", 11, "bold"),
-                                   command=self._start, width=26)
+        by_key = {k: (lbl, typ) for k, lbl, typ in spec}
+
+        head = ttk.Frame(t, padding=(14, 10, 14, 0))
+        head.pack(side="top", fill="x")
+        ttk.Label(head, text="Configure a run", font=("TkDefaultFont", 15, "bold")).pack(anchor="w")
+        ttk.Label(head, text="Fill in the sections, then press START at the bottom. Scroll with the mouse wheel or jump to a section:",
+                  style="Hint.TLabel").pack(anchor="w", pady=(2, 6))
+        chips = ttk.Frame(head)
+        chips.pack(anchor="w")
+
+        bar = ttk.Frame(t, style="Bar.TFrame", padding=(12, 8))       # packed before the scroller so it is always visible
+        bar.pack(side="bottom", fill="x")
+        sf = ScrollFrame(t)
+        sf.pack(side="top", fill="both", expand=True, pady=(8, 0))
+
+        for title, short, hint, keys in layout([k for k, _, _ in spec]):
+            card = ttk.LabelFrame(sf.body, text=title, padding=(14, 8))
+            card.pack(fill="x", padx=12, pady=6)
+            card.columnconfigure(1, weight=1)
+            r = 0
+            if hint:
+                ttk.Label(card, text=hint, style="Hint.TLabel", wraplength=900, justify="left").grid(row=0, column=0, columnspan=2, sticky="w", pady=(0, 4))
+                r = 1
+            for key in keys:
+                label, typ = by_key[key]
+                ttk.Label(card, text=label, wraplength=430, justify="left").grid(row=r, column=0, sticky="nw", padx=(0, 14), pady=4)
+                w = self._make_field(card, sf, key, typ)
+                w.grid(row=r, column=1, sticky="ew" if typ in ("str", "list") else "w", pady=4)
+                r += 1
+            ttk.Button(chips, text=short, style="Chip.TButton", command=lambda c=card: sf.scroll_to(c)).pack(side="left", padx=(0, 6))
+
+        row1 = ttk.Frame(bar, style="Bar.TFrame")
+        row1.pack(fill="x")
+        btn = dict(fg="white", relief="flat", font=("TkDefaultFont", 11, "bold"), padx=14, pady=6, cursor="hand2", activeforeground="white")
+        self.start_btn = tk.Button(row1, text="START RUN (existing model)", bg="#0a7a0a", activebackground="#0c9a0c", command=self._start, **btn)
         self.start_btn.pack(side="left")
-        self.scratch_btn = tk.Button(b, text="CREATE MODEL FROM SCRATCH + START", bg="#1a4fa0", fg="white", font=("TkDefaultFont", 11, "bold"),
-                                     command=lambda: self._start(scratch=True), width=36)
-        self.scratch_btn.pack(side="left", padx=8)
-        ttk.Button(b, text="Load config...", command=self._load).pack(side="left", padx=8)
-        ttk.Button(b, text="Test brain connection", command=self._test_brain).pack(side="left")
-        ttk.Button(b, text="Ollama: list models", command=self._ollama_list).pack(side="left", padx=4)
-        ttk.Button(b, text="Ollama: pull model", command=self._ollama_pull).pack(side="left")
-        ttk.Button(b, text="Save config...", command=self._save).pack(side="left")
-        ttk.Label(t, text="API keys are read from environment variables (ANTHROPIC_API_KEY / OPENAI_API_KEY, HF_TOKEN). "
-                          "The run can only end by: goal reached, budget exhausted, or your STOP.",
-                  foreground="#555").grid(row=len(spec) + 1, column=0, columnspan=2, sticky="w", padx=8)
+        self.scratch_btn = tk.Button(row1, text="CREATE MODEL FROM SCRATCH + START", bg="#1a4fa0", activebackground="#2362c4",
+                                     command=lambda: self._start(scratch=True), **btn)
+        self.scratch_btn.pack(side="left", padx=10)
+        row2 = ttk.Frame(bar, style="Bar.TFrame")
+        row2.pack(fill="x", pady=(8, 0))
+        for text, cmd in (("Load config...", self._load), ("Save config...", self._save), ("Test brain connection", self._test_brain),
+                          ("Ollama: list models", self._ollama_list), ("Ollama: pull model", self._ollama_pull)):
+            ttk.Button(row2, text=text, command=cmd).pack(side="left", padx=(0, 6))
+        ttk.Label(bar, style="BarHint.TLabel",
+                  text="API keys are read from environment variables (ANTHROPIC_API_KEY / OPENAI_API_KEY, HF_TOKEN). "
+                       "The run can only end by: goal reached, budget exhausted, or your STOP.").pack(anchor="w", pady=(8, 0))
+
+    def _make_field(self, parent, sf, key, typ):
+        val = getattr(self.cfg, key)
+        if typ == "bool":
+            v = tk.BooleanVar(value=val)
+            w = ttk.Checkbutton(parent, variable=v)
+        elif typ == "list":
+            v = tk.StringVar(value=", ".join(val))
+            w = ttk.Entry(parent, textvariable=v)
+        elif isinstance(typ, tuple):
+            v = tk.StringVar(value=val)
+            w = ttk.Combobox(parent, textvariable=v, values=typ, state="readonly", width=24)
+            sf.guard_wheel(w)
+        else:
+            v = tk.StringVar(value=str(val))
+            w = ttk.Entry(parent, textvariable=v, width=18 if typ in ("int", "float") else 40)
+        self.vars[key] = v
+        return w
 
     def _collect(self) -> Config:
         kw = {}
